@@ -28,6 +28,7 @@ def solve_chunkrow(chunk_index_x, chunks, row_len):
             continue
 
         # --- SOLVE COLLISIONS ---
+        # (Array Solving (Enables GPU Offloading))
         listlen = len(particlelist)
         data_arr = numpy.full(listlen*4, 0, dtype=numpy.float32)
 
@@ -36,6 +37,7 @@ def solve_chunkrow(chunk_index_x, chunks, row_len):
             p_arr = particlelist[i].to_np_arr()
             data_arr[index_start:index_start+4] = p_arr
 
+        #print(legacy_compare_x, legacy_compare_y)
         solved = tools.solve_collision_array(data_arr)
         for i in range(listlen):
             index_start = i*4
@@ -57,7 +59,7 @@ if __name__ == "__main__":
 
     # Setup physics sim
     particles = []
-
+    
     # Multiprocessing
     pool = multiprocessing.Pool(processes=settings.pool_size)
 
@@ -86,7 +88,7 @@ if __name__ == "__main__":
         time_splits.append(time.time())
 
         # --- COLLISION DETECTION --- 
-        for i in range(settings.substeps):
+        for i in range(settings.collision_substeps):
             for chunk_index_x in range(1, len(chunks), 3):
                 solve_chunkrow(chunk_index_x, chunks, len(chunks[0]))
 
@@ -97,7 +99,8 @@ if __name__ == "__main__":
         if pygame.mouse.get_pressed()[0]:
             mpos_to_vec = vector2(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
         
-        particles = pool.map(tools.full_particle_update, particles, math.ceil(len(particles)/settings.pool_size))
+        for i in range(settings.physics_substeps):
+            particles = pool.map(tools.full_particle_update, particles, math.ceil(len(particles)/settings.pool_size))
 
         for p in particles:
             if pygame.mouse.get_pressed()[0]:

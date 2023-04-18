@@ -51,28 +51,29 @@ def solve_collision_array(arr):
                 v1_l = math.sqrt(v1_x*v1_x+v1_y*v1_y)
                 v2_l = math.sqrt(v2_x*v2_x+v2_y*v2_y)
 
-                a1 = ((v1_x + pullvec_x) * v2_l)
-                a2 = ((v1_y + pullvec_y) * v2_l)
+                ax = (v1_x + (pullvec_x * v2_l))
+                ay = (v1_y + (pullvec_y * v2_l))
 
-                b1 = ((v2_x - pullvec_x) * v1_l)
-                b2 = ((v2_y - pullvec_y) * v1_l)
+                bx = (v2_x - (pullvec_x * v1_l))
+                by = (v2_y - (pullvec_y * v1_l))
 
-                al = math.sqrt(a1*a1 + a2*a2)
-                bl = math.sqrt(b1*b1 + b2*b2)
+                # Max to protect from zerodiv
+                al = max(math.sqrt(ax*ax + ay*ay), 0.01)
+                bl = max(math.sqrt(bx*bx + by*by), 0.01)
 
-                a1 = a1 / al
-                a2 = a2 / al
-                b1 = b1 / bl
-                b2 = b2 / bl
+                axn = ax / al
+                ayn = ay / al
+                bxn = bx / bl
+                byn = by / bl
 
-                arr[i+2] = a1*v1_l*settings.bounce_coeff
-                arr[i+3] = a2*v1_l*settings.bounce_coeff
-                arr[j+2] = b1*v2_l*settings.bounce_coeff
-                arr[j+3] = b2*v2_l*settings.bounce_coeff
+                arr[i+2] = axn*v1_l*settings.bounce_coeff
+                arr[i+3] = ayn*v1_l*settings.bounce_coeff
+                arr[j+2] = bxn*v2_l*settings.bounce_coeff
+                arr[j+3] = byn*v2_l*settings.bounce_coeff
 
     return arr
 
 def full_particle_update(p):
     p = keep_part_IB(p)
-    p.update(1/60)
+    p.update(settings.frame_target / settings.physics_substeps)
     return p

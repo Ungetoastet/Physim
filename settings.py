@@ -11,8 +11,9 @@ particle_size = 5 # Should be >1
 frame_target = 1/60
 gravity = vector.vector2.down()
 chunk_size = particle_size*5
-substeps = 5
-max_particles = 0 # 0 for max
+collision_substeps = 5
+physics_substeps = 2
+max_particles = 100 # 0 for max
 
 x_chunks = math.ceil(res[0] / chunk_size)
 if x_chunks % 3 != 0:
@@ -31,6 +32,3 @@ bg_col_b = (52, 52, 58)
 main_col = (48, 188, 237)
 accent_col = (252, 81, 48)
 accent_col_b = (252, 151, 131)
-
-# Optimization settings
-thread_count = 2
